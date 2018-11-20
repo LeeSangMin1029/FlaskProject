@@ -11,5 +11,6 @@ check_password_hash(hash, password)는 위 함수에서 hash된 password를 사�
 예를 들면 
 > {% if current_user.is_authenticated %} <- 이게 맞는 문법인데 
 > {% if current_user.is_authenticated() %} 이런식으로 혼란을 준다거나...
+
 정작 git checkout 버전넘버(8c)를 입력해서 해당 부분을 검토하면 괄호가 사라져있고... 내용을 잘 진행하다가 이런 사소한 문제 때문에 힘들다. 
 requirements.txt는 일단 계속 업데이트를 하고 있는데, 이 파일이 필요한 이유는 다른 사람들과 내가 협업을 할 때 내 앱(그러니까 프로젝트)이 어떤 라이브러리 버젼을 사용하는지 적어놓지 않으면 혼란이 오기 때문인것 같다.
