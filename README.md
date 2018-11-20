@@ -6,7 +6,9 @@ requirements.txt 파일은 주기적으로 업데이트 필요, database(SQLAlch
 git reset --hard 돌아갈 commit 번호
 ## 18/11/20
 generate_password_hash(password, options..)는 사용자로부터 입력받은 password를 데이터베이스에 저장할 수 있는 문자열인 password_hash를 리턴하는 함수이다.
+
 check_password_hash(hash, password)는 위 함수에서 hash된 password를 사용자가 입력한 password와 비교해서 맞으면 True 틀리면 False를 리턴한다.
+
 책에서 로그인 폼을 추가하는 부분을 공부하던 도중 오류가 나서 애를 먹었다. 
 예를 들면 
 > {% if current_user.is_authenticated %} <- 이게 맞는 문법인데 
