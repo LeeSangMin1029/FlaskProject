@@ -62,3 +62,57 @@ def register():
     return render_template('auth/register.html', form=form)
 ```
 사용자가 계정을 추가하는 버튼 'Register'버튼을 누르면 자동으로 데이터베이스에 사용자의 정보가 저장이 된다.
+
+## 18/11/25
+영어 공부도 하고, 플라스크 책말고 다른 파이썬 책을 읽다보니 시간이 벌써 3일이 지나버렸다.
+공부한 내용은 별로 안되지만 일단 정리해봤다. 보통 계정이 필요한 웹사이트에서는 처음에 가입을 할 때 이메일, 아이디, 비밀번호를 쳐서 계정을 생성한다. 이 때 가입을 하면 웹사이트 상단, 하단 등 아니면 새로 페이지를 생성해서 사용자에게 무슨 인증을 받으라고 한다. 그전까지는 일부 콘텐츠를 이용하지 못한다거나 그러한 제약 부분이 존재한다는 것? 내가 생각하기에는 이 인증부분이 내가 지금 배우고 있는 것과 똑같은 부분이지 않을까 생각한다. 책에서도 이해가 되지는 않지만 얼추 비슷한 내용이 있다.
+> 애플리케이션에서는 이메일 주소를 검증하기 위해 사용자가 가입 즉시 확인 이메일을 사용자에게 전송한다. 새로운 계정은 처음에는 사용자에게 전송한 이메일이 확인될 때까지 미확인 상태로 유지한다. 계정 확인은 확인 토큰을 포함하고 있는 특정 URL 링크를 클릭하도록 하는 과정을 포함한다.
+
+http://www.example.com/auth/confirm/<id> 이런식으로 계정확인을 할 경우 문제점이 있다. 보안상으로도 안전하지 못하고 사용자가 계정을 확인하는 링크를 알고있다면 사용자 id에 임의의 숫자를 입력해서 아무렇게나 계정을 확인할 수 있게 된다. 어떻게 해결하냐면 사용자 id를 포함하는 보안 토큰으로 대체하는데 이때 **itsdangerous** 패키지를 사용하면 된다고 한다.
+
+```python
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask import curren_app
+from flask_login import UserMixin
+from . import db
+#...
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
+    confirmed=db.Column(db.Boolean, default=False)
+    #...
+
+    def generate_confirmation_token(self, expiration=3600):
+        s=Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'confirm':self.id})
+    
+    def confirm(self, token):
+        s=Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data=s.loads(token)
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed=True
+        db.session.add(self)
+        return True
+```
+
+**TimedJSONWebSignatureSerializer**는 이름이 너무 길어서 **Serializer**로 수정한다. **Serializer**클래스는 시간 만료 정보를 사용하여 JWS를 생성한다. 이 클래스의 생성자는 인수로 위와 같이 키(SECRET_KEY), 만료시간(expiration) 이렇게 넣어줄 수 있다. SECRET_KEY는 config.py에 정의되어 있는 사용자 정의 키다. expiration은 초 단위로 토큰의 만료시간을 정해주는 인수다. generate_confirmation_token() 메소드는 한 시간의 기본 검증 시간을 갖고 토큰을 생성한다. (한 시간이 지난 토큰을 가지고 계정확인을 한다면 아마 오류가 나겠지?)
+dumps() 메소드는 인수로 주어진 데이터를 위한 signature password(임의적으로 바꿀 수 없는 암호)를 생성하고 **{'confirm':self.id}**해당 데이터를 토큰 문자열로서 signature를 직렬화한다. (무슨 소린지 모르겠지만 하다보면 알게되겠지...)
+
+토큰을 디코딩하려면 **Serializer**가 제공하는 loads() 메소드를 이용하면 된다. loads() 메소드를 이용해서 정의한 함수가 confirm() 메소드이다. 해당 메소드는 토큰을 검증하고 맞으면 True값을 반환하는 기능을 가지고 있다.
+만약 예를 들어 어떤 유저의 토큰을 추출하려면 다음과 같이 하면 된다. 해당 명령은 python shell에서 실행했다.() 주의할 점은 loads() 메소드는 올바르지 않은 토큰이 주어지거나 만료된 토큰이 주어진다면 예외가 발생하니 위와 같이 예외처리를 잘 해두면 예상치 못했던 에러를 방지 할 수 있다.
+
+```python
+User.query.filter_by().first()
+lsm=User.query.filter_by().first()
+token=lsm.generate_confirmation_token()
+token
+# 이와 같이 토큰이 성공적으로 추출된다. 길어서 생략
+b'eyJhbGciOiJIUzUxMiIsImlhdCI6MTU0MzE0NTM5MywiZXhwIjoxNTQzMTQ4OTkzfQ.eyJjb25maXJtIjoxfQ.......'
+# 해당 토큰이 맞는지 확인하려면 위에 정의해놓은 메소드를 사용하면 된다.
+lsm.confirm(token)
+True
+```
