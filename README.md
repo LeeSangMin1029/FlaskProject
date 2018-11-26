@@ -100,7 +100,7 @@ class User(db.Model, UserMixin):
 ```
 
 **TimedJSONWebSignatureSerializer**는 이름이 너무 길어서 **Serializer**로 수정한다. **Serializer**클래스는 시간 만료 정보를 사용하여 JWS를 생성한다. 이 클래스의 생성자는 인수로 위와 같이 키(SECRET_KEY), 만료시간(expiration) 이렇게 넣어줄 수 있다. SECRET_KEY는 config.py에 정의되어 있는 사용자 정의 키다. expiration은 초 단위로 토큰의 만료시간을 정해주는 인수다. generate_confirmation_token() 메소드는 한 시간의 기본 검증 시간을 갖고 토큰을 생성한다. (한 시간이 지난 토큰을 가지고 계정확인을 한다면 아마 오류가 나겠지?)
-dumps() 메소드는 인수로 주어진 데이터를 위한 signature password(임의적으로 바꿀 수 없는 암호)를 생성하고 **{'confirm':self.id}**해당 데이터를 토큰 문자열로서 signature를 직렬화한다. (무슨 소린지 모르겠지만 하다보면 알게되겠지...)
+dumps() 메소드는 인수로 주어진 데이터를 위한 signature password(임의적으로 바꿀 수 없는 암호)를 생성하고 **\'confirm':self.id**해당 데이터를 토큰 문자열로서 signature를 직렬화한다. (무슨 소린지 모르겠지만 하다보면 알게되겠지...)
 
 토큰을 디코딩하려면 **Serializer**가 제공하는 loads() 메소드를 이용하면 된다. loads() 메소드를 이용해서 정의한 함수가 confirm() 메소드이다. 해당 메소드는 토큰을 검증하고 맞으면 True값을 반환하는 기능을 가지고 있다.
 만약 예를 들어 어떤 유저의 토큰을 추출하려면 다음과 같이 하면 된다. 해당 명령은 python shell에서 실행했다.() 주의할 점은 loads() 메소드는 올바르지 않은 토큰이 주어지거나 만료된 토큰이 주어진다면 예외가 발생하니 위와 같이 예외처리를 잘 해두면 예상치 못했던 에러를 방지 할 수 있다.
