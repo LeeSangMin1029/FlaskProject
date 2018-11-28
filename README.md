@@ -1,8 +1,14 @@
 # FlaskProject
-## 참고하는 책
-**플라스크 웹 개발**이라는 외국 도서를 번역한 책이다. 아마 인터넷에서 글을 올리다가 이렇게 책으로 출간한 것 같다. git과 blog를 참고하면 좋다.
-[git](https://github.com/miguelgrinberg/flasky)
-[blog](https://blog.miguelgrinberg.com/)
+**플라스크 웹 개발**은 외국 도서를 번역한 책이다. 아마 인터넷에서 글을 올리다가 이렇게 책으로 출간한 것 같다. 
+
+오탈자 나와있는 곳:[flasky](https://www.flaskbook.com/)
+
+git주소:[git](https://github.com/miguelgrinberg/flasky)
+
+blog주소:[blog](https://blog.miguelgrinberg.com/)
+
+원래 README에는 버그, 사용법, 배포자 등을 작성하지만 아직 그 단계는 아니니 공부한 것을 작성하자.
+참고로 clone해서 애플리케이션을 실행시키려면 python을 실행시킬 수 있는 환경에서 python run.py로 실행하면 된다.
 ## 18/11/19
 requirements.txt 파일은 주기적으로 업데이트 필요, database(SQLAlchemy)와 test(unittest)할 파일 추가함. 만약 온라인 상에서 파일을 변경하였다면 pull 명령어를 사용하여 충돌을 피해야 함
 이거는 내가 전에 sqlalchemy를 처음 사용하면서 경험했던 pylint와 관련된 issue : [issue related to pylint](https://github.com/Microsoft/vscode-python/issues/292)
@@ -116,3 +122,5 @@ b'eyJhbGciOiJIUzUxMiIsImlhdCI6MTU0MzE0NTM5MywiZXhwIjoxNTQzMTQ4OTkzfQ.eyJjb25maXJ
 lsm.confirm(token)
 True
 ```
+## 18/11/26
+근데 왜 이메일이 전송이 안되지..? 원래 안되는 건가
